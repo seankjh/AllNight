@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper 파일 필수 구성 요소 
+1. DTD(Document Type Definition) 선언
+2. <mapper namespace=""> 루트 태그
+-->
+
+
+<mapper namespace="edu.spring.ex02.ReplyMapper">
+
+	<select id="getBno" resultType="Integer">
+	select bno from tbl_reply where rno = #{rno}
+	</select>
+
+	<select id="bnoReplies" resultType="Integer">
+	select count(*) from tbl_reply where bno = #{bno}
+	</select>
+
+    <select id="numOfReplies" resultType="Integer">
+    select count(*) from tbl_reply
+    </select>
+    
+    <insert id="insert">
+    insert into tbl_reply(bno, rtext, replier)
+    values (#{bno}, #{rtext}, #{replier})
+    </insert>
+    
+    <select id="select" 
+        resultType="edu.spring.ex02.domain.ReplyVO">
+        select * from tbl_reply
+        where bno = #{bno} <!-- 해당 게시글의 댓글만 검색 -->
+        order by rno desc <!-- 최신 댓글을 먼저 보여줌 -->
+    </select>
+    
+    <update id="update">
+    update tbl_reply
+    set rtext = #{rtext}, regdate = sysdate
+    where rno = #{rno}
+    </update>
+    
+    <delete id="delete">
+    delete from tbl_reply where rno = #{rno}
+    </delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+

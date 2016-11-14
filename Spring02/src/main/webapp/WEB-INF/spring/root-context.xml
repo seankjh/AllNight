@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd">
+	<!-- 굳이 싱글턴패턴을 적용하지 않아도 한번만 생성해서 재활용한다. -->
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	
+		<!-- xmlns: XML namespace -->
+			<!-- xml태그들을 사용하려면 네임스페이스를 선언을 해줘야한다. -->
+		
+		<!-- 해당 패키지 아래에 어노테이션이 있는 모든 클래스를 스캔헤서 bean 객체로 생성/관리 -->
+		<context:component-scan 
+			base-package="edu.spring.ex02.persistence">
+		</context:component-scan>
+		 <!-- ㄴ스프링프레임웍은 패키지 밑에 있는 클래스들을 스캔해서 특별한 클래스들은 빈으로 만들겠다. -->
+		 <!-- 클래스에서 특별한 종류의 클래스라고 선언을 해야한다. 방법은 2가지 -->
+		 	<!-- 1. 클래스에 @Component 붙이기 -->
+		 	<!-- 2. @Repository 붙이기 -->
+		 	
+		<context:component-scan 
+	  	 	base-package="edu.spring.ex02.service">
+		</context:component-scan>
+		 
+		 <!-- Bean: 스프링 프레임워크가 생성과 주입을 관리하는 객체(클래스)-->
+		 <!-- Bean Property: 클래스의 멤버 변수(필드)  -->
+		 <!-- Oracle Connection Pool Data Source 빈 -->
+		 <bean id="dataSource" class="oracle.jdbc.pool.OracleDataSource">	<!-- 빈 객체를 생성해주세요 --><!-- 라이브러리가 추가가 되어서 자동완성이 됨. -->
+		 	<property name="dataSourceName" value="ds"/>	<!-- 디폴트 생성자 불러 놓고 값들을 set하는 것이다.-->
+		 	<property name="URL" value="jdbc:oracle:thin:@localhost:1521:xe"/>
+		 	<property name="user" value="scott"/>
+		 	<property name="password" value="tiger"/>		 	
+		 </bean><!-- 여기에 있는 id는 여기서 참조용으로만 사용  -->
+		
+		<!-- Mybatis SqlSessionFactory 빈  -->
+		<!-- 오라클 DataSource 객체를 사용해서 생성 --><!-- sqlSessionFactory는 무슨 db를 사용하든 의존적.. 그래서 dataSource를 참조해야한다. -->
+		<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"><!-- 만들기 위해서는 dataSource가 필요 -->
+			<property name="dataSource" ref="dataSource"/><!-- 위의 bean의 id 참조 --><!-- oracledatasoucre를 setter로 넣어주겠다. -->
+			<!-- MyBatis 설정 파일 위치를 선언 -->
+			<property name="configLocation" value="classpath:mybatis-config.xml"/><!-- mybatis-config.xml를 classpath위치에 만들겠다. --><!-- classpath : src/main/resources  -->
+			<!-- 매퍼(mapper) 파일 위치 선언 -->
+			<property name="mapperLocations" value="classpath:mappers/*.xml"/>		
+		</bean>
+		
+		<!-- SqlSession 빈: SqlSessionFactory를 사용해서 생성 -->
+		<!-- 실제로 트랜잭션을 관리 -->
+		<bean id="sqlSession" 
+			class="org.mybatis.spring.SqlSessionTemplate"
+			destroy-method="clearCache">
+		 <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"/><!-- 세션을 만들어주는 공장이 있어야한다. -->
+		 <!-- 매개변수가 있는 생성자를 불러서, 생성자의 매개변수를 채워넣겠다. -->
+		</bean>
+		
+			<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"> 
+	<property name="host" value="smtp.gmail.com"/>
+	 <property name="port" value="25"/>
+        <property name="username" value="taehun1214@gmail.com"/>
+        <property name="password" value="xogns741"/>
+        <property name="javaMailProperties">
+            <props>
+                <prop key="mail.transport.protocol">smtp</prop>
+                <prop key="mail.smtp.auth">true</prop>
+                <prop key="mail.smtp.starttls.enable">true</prop>
+            </props>
+        </property>
+	</bean>
+		
+		
+		<!-- Persistence Layer(DAO 클래스) 콤포넌트를 빈으로 등록 -->
+	<context:component-scan 
+	   base-package="edu.spring.ex02.persistence" />
+	<!-- Service Layer(Service 클래스) 콤포넌트를 빈으로 등록 -->
+	<context:component-scan 
+	   base-package="edu.spring.ex02.service" />
+	<!-- AOP 콤포넌트를 빈으로 등록 -->
+	<context:component-scan 
+	   base-package="edu.spring.ex02.aop" />
+	   
+</beans>
+<!-- Beans(복수) 빈들 여러개  -->
+
+
+<!-- ref: Reference(참조) -->

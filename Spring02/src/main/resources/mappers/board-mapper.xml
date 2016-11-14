@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- 자바소스코드에서 아이디를 찾을 수 있게..
+  유일한 아이디를 주기 위해서 도메인까지써서 만들곤 한다.-->
+  <mapper namespace="edu.spring.ex02.BoardMapper">
+  	  
+      <!-- Create: 새 게시글 작성 --> 
+      <insert id="insert">
+          insert into tbl_board2(title, content, userid)
+          values(#{title}, #{content}, #{userid})
+      </insert>
+      
+      <!-- Read(select): 게시글 전체 검색 -->
+      <!-- <select id="selectAll" resultType="edu.spring.ex02.domain.BoardVO"> -->
+      <select id="selectAll" resultType="BoardVO">
+          select * from tbl_board2
+          order by bno desc
+      </select>
+      
+      <!-- 해당 글번호(bno)의 게시글 검색  -->
+      <!-- <select id="selectByBno"
+          resultType="edu.spring.ex02.domain.BoardVO"> -->
+       <select id="selectByBno"  resultType="BoardVO"><!-- mybatis-config 설정으로 인해 가능 -->
+          select * from tbl_board2
+          where bno = #{bno}
+      </select>
+      
+       <update id="update">
+           update tbl_board2 
+           set title = #{title}, content = #{content}, regdate = sysdate
+           where bno = #{bno}
+       </update><!-- jsp > controller > mapper > DAO > DAOImpl > TestBoardDAO -->
+       
+       <delete id="delete">
+           delete from tbl_board2 where bno = #{bno}
+       </delete>
+       
+       <!-- 테이블의 전체 레코드 개수를 검색 -->
+		<select id="totalCount" resultType="Integer">
+		select count(*) from tbl_board2
+		</select>
+       
+  		<!-- 페이징 처리를 위한 SQL -->
+  		<select id="listPage" resultType="BoardVO">
+  		    select b.bno, b.title, b.content, b.userid, b.regdate
+  		    from (
+  		    	select rownum rn, a.* <!-- a의 데이터를 모두 출력하껬다. -->
+  		    	from (
+  		    	select * from tbl_board2 order by bno desc
+  		    	) a
+  		    ) b
+  		    where rn between #{start} and #{end}
+  		   <!--
+  		    order by : 검색된 행의 조회 순서를 지정
+	  		   ASC : 오름 차순, Default 값
+	  		   DESC : 내림차순
+  		    -->
+  		</select>
+
+<update id="updateReplyCnt">
+update tbl_board2 set replycnt = replycnt + #{amount}
+where bno = #{bno}
+</update>
+
+<update id="transactionTest">
+update tbl_board2 set replycnt = replycnt + #{amount}
+where no = #{bno}
+</update>
+  
+  		
+  </mapper>
+  
+  <!--
+	  마이바티스의 가장 강력한 기능 중 하나는 동적 SQL을 처리하는 방법이다.
+	   JDBC나 다른 유사한 프레임워크를 사용해본 경험이 있다면 
+	   동적으로 SQL 을 구성하는 것이 얼마나 힘든 작업인지 이해할 것이다.
+	    간혹 공백이나 콤마를 붙이는 것을 잊어본 적도 있을 것이다.
+	     동적 SQL 은 그만큼 어려운 것이다.
+	
+		동적 SQL 을 사용하는 것은 결코 파티가 될 수 없을 것이다. 
+		마이바티스는 강력한 동적 SQL 언어로 이 상황은 개선한다.
+    -->
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+ <!-- SQL 문장들을 작성하는 XML 파일 -->
+ <mapper namespace="edu.spring.ex02.MemberMapper">
+     
+     <!-- INSERT SQL문 --> 				<!-- #{} : 스프링에서 사용하는 EL -->
+     <insert id="member-insert">
+         insert into tbl_member(userid, password, email)
+         values(#{userid}, #{password}, #{email}) 
+     </insert>
+     
+     <!-- 전체 검색 SELECT  -->
+     <select id="member-select-all"
+         resultType="edu.spring.ex02.domain.MemberVO">
+         <!--MemberVO 구조는 테이블 구조와 똑같이 만들어야 한다.  -->
+      select * from tbl_member
+     </select>
+     
+      <!-- userid로 검색하는 SQL문 -->
+    <select id="select-by-userid"
+        resultType="edu.spring.ex02.domain.MemberVO">
+    select * from tbl_member where userid = #{userid}
+    </select>
+    
+    <!-- 해당 userid의 password와 email을 수정(업데이트) -->
+    <update id="update">
+    update tbl_member set password = #{password}, email = #{email}
+    where userid = #{userid}
+    </update>
+    
+    <!-- 해당 userid 데이터 삭제  -->
+    <delete id="delete">
+    delete from tbl_member where userid = #{userid}
+    </delete>
+    
+    <update id="update-email">
+    update tbl_member set email = #{email} where userid = #{userid}
+    </update>
+    
+ </mapper>
